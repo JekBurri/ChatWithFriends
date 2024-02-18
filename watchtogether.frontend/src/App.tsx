@@ -37,6 +37,7 @@ function App() {
 
   const sendMessage = async(message:string) => {
     try {
+      // @ts-ignore
       await conn.invoke("SendMessage", message);
     } catch (error) {
       console.log(error);
@@ -52,19 +53,17 @@ function App() {
         </div>
       </header>
       <section className="flex-1 overflow-hidden bg-white">
-      <div className="flex flex-col h-full">
-        {/* <div className="flex-1 p-4">
-          <h2 className="text-blue-200 text-2xl">Welcome to the Chat App</h2>
-          <p>Start editing to see some magic happen :)</p>
-        </div> */}
+      <div className="flex justify-around gap-4">
+       
 
         {!conn ? (
-          <div className="flex-1 p-4">
+          <div className="flex-1 p-4 max-w-lg m-auto">
             <WaitingRoom joinChatRoom={joinChatRoom} />
           </div>
         ) : (
-          <div className="flex-1 p-4">
+          <div className="flex p-4">
             <ChatRoom messages={messages} sendMessage={sendMessage} />
+            <canvas id="canvas" height={500} width={500} className="border"></canvas>
           </div>
         )}
       </div>

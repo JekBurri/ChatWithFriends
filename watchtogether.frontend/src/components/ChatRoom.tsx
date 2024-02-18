@@ -13,14 +13,14 @@ export default function ChatRoom({messages, sendMessage}: any) {
 
 
     return (<>
-        <div className="flex flex-col flex-1 overflow-hidden bg-white">
+        <div className="flex flex-col flex-1 overflow-hidden bg-white max-w-lg">
   {/* Chat Room Title */}
   <div className="flex justify-center items-center bg-gray-200 p-2">
     <h2 className="text-lg font-semibold">Chat Room</h2>
   </div>
 
   {/* Message Container */}
-  <div className="flex-1 overflow-y-auto px-5 py-3 max-h-60" ref={messagesContainerRef}>
+  <div className="flex-1 overflow-y-auto px-5 py-3" ref={messagesContainerRef}>
     <MessageContainer messages={messages} />
   </div>
 
