@@ -1,0 +1,6 @@
+@WatchTogetherSignalR_HostAddress = http://localhost:5289
+
+GET {{WatchTogetherSignalR_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
