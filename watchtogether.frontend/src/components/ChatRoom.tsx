@@ -8,6 +8,7 @@ export default function ChatRoom({messages, sendMessage}: any) {
 
     useEffect(() => {
         // Automatically scroll to the bottom when new messages are added
+        //@ts-ignore
         messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
       }, [messages]);
 
