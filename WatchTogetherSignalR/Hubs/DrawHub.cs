@@ -1,28 +1,25 @@
-// using Microsoft.AspNetCore.SignalR;
-// using WatchTogetherSignalR.Models;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.OpenApi.Any;
+using System.Threading.Tasks;
+using WatchTogetherSignalR.Models;
 
-// namespace WatchTogetherSignalR.Hubs;
+namespace WatchTogetherSignalR.Hubs
+{
+    public class DrawHub : Hub
+    {
+        private readonly SharedDb _shared;
 
-// public class DrawHub : Hub {
-    
-//     private readonly SharedDb _shared;
+        public DrawHub(SharedDb shared) => _shared = shared;
 
-//     public DrawHub(SharedDb shared) => _shared = shared;
-//     public async Task JoinDraw(UserConnection conn) {
-//         await Clients.All.SendAsync("RecieveMessage", "admin", $"{conn.Username} has joined");
-//     }
+        public async Task SaveDrawing(int drawingId, Dictionary<string, object> drawingData)
+        {
+            _shared.drawings.TryAdd(drawingId.ToString(), new DrawConnection { DrawingId = drawingId, DrawingData = drawingData });
 
-//     public async Task JoinSpecificDrawRoom(UserConnection conn) {
-//         await Groups.AddToGroupAsync(Context.ConnectionId, conn.DrawRoom);
+            await Clients.Group(drawingId.ToString()).SendAsync("ReceiveDrawing", drawingId, drawingData);
 
-//         _shared.connections[Context.ConnectionId] = conn;
+            // Add a console log to confirm that SaveDrawing was called
+            Console.WriteLine($"Drawing saved: {drawingId}");
+        }
 
-//         await Clients.Group(conn.DrawRoom).SendAsync("RecieveMessage", "admin", $"{conn.Username} has joined {conn.DrawRoom}");
-//     }
-
-//     public async Task SendMessage(string message) {
-//         if(_shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn)) {
-//             await Clients.Group(conn.DrawRoom).SendAsync("RecieveMessage", conn.Username, message);
-//         }
-//     }
-// }
+    }
+}

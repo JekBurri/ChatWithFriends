@@ -1,5 +1,10 @@
-namespace WatchTogetherSignalR.Models;
+using Microsoft.OpenApi.Any;
 
-public class DrawConnection {
-    
+namespace WatchTogetherSignalR.Models
+{
+    public class DrawConnection
+    {
+        public int DrawingId { get; set; }
+        public Dictionary<string, object> DrawingData { get; set; }
+    }
 }
