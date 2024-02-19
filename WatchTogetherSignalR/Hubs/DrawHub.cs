@@ -15,7 +15,7 @@ namespace WatchTogetherSignalR.Hubs
         {
             _shared.drawings.TryAdd(drawingId.ToString(), new DrawConnection { DrawingId = drawingId, DrawingData = drawingData });
 
-            await Clients.Group(drawingId.ToString()).SendAsync("ReceiveDrawing", drawingId, drawingData);
+            await Clients.All.SendAsync("ReceiveDrawing", drawingData);
 
             // Add a console log to confirm that SaveDrawing was called
             Console.WriteLine($"Drawing saved: {drawingId}");

@@ -40,7 +40,7 @@ function App() {
     console.log("click");
   
       // @ts-ignore
-    if (canvasRef && canvasRef) {
+    if (canvasRef) {
       // @ts-ignore
       const saveData = canvasRef.getSaveData();
   
@@ -67,6 +67,7 @@ function App() {
   
 
   const joinChatRoom = async (username: string, chatroom: string) => {
+  
     setRoom(chatroom);
     try {
       // @ts-ignore
@@ -101,18 +102,21 @@ function App() {
         .configureLogging(LogLevel.Information)
         .build();
 
-      canvasConn.on(
-        "ReceiveDrawing",
-        (drawingId: number, drawingData: JsonData) => {
-          console.log("Drawing received:", drawingId, drawingData);
-          // @ts-ignore
-          canvasRef.loadSaveData(JSON.stringify(drawingData), true);
-        }
-      );
+      console.log(canvasRef);
+
+      canvasConn.on("ReceiveDrawing", (drawingData: any) => {
+        console.log("Drawing received:", drawingData);
+        console.log("Loading drawing...");
+      
+        // Use optional chaining to check if canvasRef is not null or undefined
+        canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
+      });
+      
 
       await canvasConn.start();
       // @ts-ignore
       setCanvasConnection(canvasConn);
+      
     } catch (error) {
       console.error("Error creating connection:", error);
     }
