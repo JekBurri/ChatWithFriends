@@ -12,6 +12,8 @@ function App() {
   const [brushColor, setBrushColor] = useState("#000000");
   const [canvasRef, setCanvasRef] = useState(null);
   const [room, setRoom] = useState("");
+  const [drawingRoomId, setDrawingRoomId] = useState<number>(0);
+  const [drawing, setDrawing] = useState<string>();
 
   type Point = {
     x: number;
@@ -31,16 +33,40 @@ function App() {
   };
 
   useEffect(() => {
-    if (canvasRef) {
-      console.log("Canvas reference set:", canvasRef);
+   
+    const loadCanvasData = async () => {
+      try {
+        // Assuming drawingRoomId is defined somewhere in your component
+        const parsedDrawingRoomId = drawingRoomId;
+    
+        console.log("Parsed Drawing Room Id:", parsedDrawingRoomId);
+    
+        if (canvasConnection) {
+          await canvasConnection.invoke("GetDrawing", parsedDrawingRoomId);
+        } 
+    } catch (error) {
+      console.error("Error loading canvas data:", error);
     }
-  }, [canvasRef]);
+  }
+
+    if (canvasRef && canvasConnection) {
+      console.log("Loading canvas data...");
+      loadCanvasData();
+    }
+  }, [canvasRef, canvasConnection, drawingRoomId]);
+  
+  const handleState = async() => {
+    console.log("click");
+    console.log(drawing);
+    if(canvasConnection) {
+
+      await canvasConnection.invoke("GetDrawing", drawingRoomId);
+    } else {console.log("Canvas connection isn't loaded in handleState")}
+  }
 
   const handleSave = async () => {
-    console.log("click");
-  
-      // @ts-ignore
-    if (canvasRef) {
+    // @ts-ignore
+    if (canvasRef && canvasConnection) {
       // @ts-ignore
       const saveData = canvasRef.getSaveData();
   
@@ -51,9 +77,25 @@ function App() {
   
         try {
           // Assuming you have a drawingId for the current drawing session
-          const drawingId = 1; // Replace with the actual drawingId
-          // @ts-ignore
-          await canvasConnection.invoke("SaveDrawing", drawingId, drawingData);
+          //TODO: make drawingId chatroom specific
+          const yourString = room;
+          let uniqueNumber = 0;
+  
+          for (let i = 0; i < yourString.length; i++) {
+            uniqueNumber += yourString.charCodeAt(i);
+          }
+          setDrawingRoomId(uniqueNumber);
+          setDrawing(drawingData);
+          const drawingId = uniqueNumber; // Replace with the actual drawingId
+  
+          // Ensure that canvasConnection is started before invoking the method
+          if (canvasConnection) {
+            // @ts-ignore
+            await canvasConnection.invoke("SaveDrawing", drawingId, drawingData);
+            console.log("Drawing saved:", drawingData);
+          } else {
+            console.error("Canvas connection is not in a connected state.");
+          }
         } catch (error) {
           console.error("Error saving drawing:", error);
         }
@@ -61,13 +103,11 @@ function App() {
         console.error("Save data is null");
       }
     } else {
-      console.error("Canvas reference is null or undefined");
+      console.error("Canvas reference or connection is null or undefined");
     }
   };
   
-
   const joinChatRoom = async (username: string, chatroom: string) => {
-  
     setRoom(chatroom);
     try {
       // @ts-ignore
@@ -102,21 +142,29 @@ function App() {
         .configureLogging(LogLevel.Information)
         .build();
 
-      console.log(canvasRef);
+      // canvasConn.on("ReceiveDrawing", (drawingData: any) => {
+      //   console.log("Drawing received:", drawingData);
+      //   console.log("Loading drawing...");
+      //   //TODO:
+      //   // Use optional chaining to check if canvasRef is not null or undefined
+      //   canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
+      // });
 
-      canvasConn.on("ReceiveDrawing", (drawingData: any) => {
-        console.log("Drawing received:", drawingData);
-        console.log("Loading drawing...");
-      
-        // Use optional chaining to check if canvasRef is not null or undefined
-        canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
+      canvasConn.on("GetDrawing", (drawingData: any) => {
+        console.log("Attempting to get drawing...")
+        if (drawingData) {
+          setDrawing(drawingData);
+          console.log("Drawing received:", drawingData);
+          canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
+        } else {
+          console.error("Invalid drawingData:", drawingData);
+        }
       });
       
 
       await canvasConn.start();
       // @ts-ignore
       setCanvasConnection(canvasConn);
-      
     } catch (error) {
       console.error("Error creating connection:", error);
     }
@@ -166,6 +214,10 @@ function App() {
                     />
                     {/* Save button */}
                     <button onClick={handleSave}>Save</button>
+                    <button onClick={handleState}>TEst state</button>
+                    <button onClick={()=>canvasRef.clear()}>test clear</button>
+                    <button onClick={()=>canvasRef.undo()}>Undo</button>
+                    <button onClick={()=>canvasRef.loadSaveData(JSON.stringify(drawing), true)}>Load</button>
                   </div>
                 </div>
               </div>

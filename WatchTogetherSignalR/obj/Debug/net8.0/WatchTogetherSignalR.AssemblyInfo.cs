@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WatchTogetherSignalR")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da5df4a60616e979688626ef6636c228bdcee1d8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+684b673d0dbef9e5c04e5d266804bd42cb0c9e01")]
 [assembly: System.Reflection.AssemblyProductAttribute("WatchTogetherSignalR")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WatchTogetherSignalR")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
