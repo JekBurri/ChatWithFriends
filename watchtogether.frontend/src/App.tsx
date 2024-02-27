@@ -4,45 +4,28 @@ import { WaitingRoom } from "./components/WaitingRoom";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import ChatRoom from "./components/ChatRoom";
 import CanvasDraw from "react-canvas-draw";
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [conn, setConn] = useState();
   const [canvasConnection, setCanvasConnection] = useState();
   const [messages, setMessages] = useState([]);
   const [brushColor, setBrushColor] = useState("#000000");
-  const [canvasRef, setCanvasRef] = useState(null);
+  const [canvasRef, setCanvasRef] = useState();
   const [room, setRoom] = useState("");
-  const [drawingRoomId, setDrawingRoomId] = useState<number>(0);
-  const [drawing, setDrawing] = useState<string>();
+  const [drawingRoomId, setDrawingRoomId] = useState<string>("");
+  const [drawing, setDrawing] = useState<string>("");
 
-  type Point = {
-    x: number;
-    y: number;
-  };
-
-  type Line = {
-    points: Point[];
-    brushColor: string;
-    brushRadius: number;
-  };
-
-  type JsonData = {
-    lines: Line[];
-    width: number;
-    height: number;
-  };
+  
 
   useEffect(() => {
    
     const loadCanvasData = async () => {
-      try {
-        // Assuming drawingRoomId is defined somewhere in your component
-        const parsedDrawingRoomId = drawingRoomId;
-    
-        console.log("Parsed Drawing Room Id:", parsedDrawingRoomId);
+      try {  
+        console.log("Parsed Drawing Room Id:", drawingRoomId);
     
         if (canvasConnection) {
-          await canvasConnection.invoke("GetDrawing", parsedDrawingRoomId);
+          await canvasConnection.invoke("GetDrawing", drawingRoomId);
         } 
     } catch (error) {
       console.error("Error loading canvas data:", error);
@@ -54,42 +37,53 @@ function App() {
       loadCanvasData();
     }
   }, [canvasRef, canvasConnection, drawingRoomId]);
-  
-  const handleState = async() => {
-    console.log("click");
-    console.log(drawing);
-    if(canvasConnection) {
 
+  useEffect(() => {
+    if (drawing) {
+      canvasRef?.loadSaveData(drawing, true);
+    }
+  }, [drawing]);
+  
+  const handleState = async () => {
+    // ... other code
+  
+    // 1. Check if canvasRef and connection exist
+    if (!canvasRef || !canvasConnection) {
+      console.error("Canvas reference or connection is null or undefined");
+      return;
+    }
+  
+    console.log("Loading canvas data...");
+  
+    try {
       await canvasConnection.invoke("GetDrawing", drawingRoomId);
-    } else {console.log("Canvas connection isn't loaded in handleState")}
-  }
+      canvasRef?.loadSaveData(drawing, true);
+      console.log("Clicked LOAD -> Current state to load:", drawing);
+    } catch (error) {
+      console.error("Error loading drawing:", error);
+    }
+  };
+  
 
   const handleSave = async () => {
     // @ts-ignore
     if (canvasRef && canvasConnection) {
+      
       // @ts-ignore
       const saveData = canvasRef.getSaveData();
+      
   
       if (saveData) {
         const drawingData = JSON.parse(saveData);
   
-        console.log("Drawing Data:", drawingData);
+        console.log("Drawing being saved:", drawingData);
   
         try {
-          // Assuming you have a drawingId for the current drawing session
-          //TODO: make drawingId chatroom specific
-          const yourString = room;
-          let uniqueNumber = 0;
+          const drawingId = uuidv4();
+          setDrawingRoomId(drawingId);
   
-          for (let i = 0; i < yourString.length; i++) {
-            uniqueNumber += yourString.charCodeAt(i);
-          }
-          setDrawingRoomId(uniqueNumber);
-          setDrawing(drawingData);
-          const drawingId = uniqueNumber; // Replace with the actual drawingId
-  
-          // Ensure that canvasConnection is started before invoking the method
           if (canvasConnection) {
+            // await canvasConnection.invoke("GetDrawing", drawingRoomId);
             // @ts-ignore
             await canvasConnection.invoke("SaveDrawing", drawingId, drawingData);
             console.log("Drawing saved:", drawingData);
@@ -142,18 +136,19 @@ function App() {
         .configureLogging(LogLevel.Information)
         .build();
 
-      // canvasConn.on("ReceiveDrawing", (drawingData: any) => {
-      //   console.log("Drawing received:", drawingData);
-      //   console.log("Loading drawing...");
-      //   //TODO:
-      //   // Use optional chaining to check if canvasRef is not null or undefined
-      //   canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
-      // });
+      canvasConn.on("ReceiveDrawing", (drawingData: any) => {
+        console.log("Drawing received from backend:", drawingData);
+        console.log("Loading drawing...");
+        //TODO:
+        // Use optional chaining to check if canvasRef is not null or undefined
+        canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
+      });
 
       canvasConn.on("GetDrawing", (drawingData: any) => {
         console.log("Attempting to get drawing...")
         if (drawingData) {
-          setDrawing(drawingData);
+          setDrawing(JSON.stringify(drawingData));
+          console.log(drawingData)
           console.log("Drawing received:", drawingData);
           canvasRef?.loadSaveData(JSON.stringify(drawingData), true);
         } else {
@@ -213,11 +208,49 @@ function App() {
                       onChange={(e) => setBrushColor(e.target.value)}
                     />
                     {/* Save button */}
-                    <button onClick={handleSave}>Save</button>
-                    <button onClick={handleState}>TEst state</button>
-                    <button onClick={()=>canvasRef.clear()}>test clear</button>
-                    <button onClick={()=>canvasRef.undo()}>Undo</button>
-                    <button onClick={()=>canvasRef.loadSaveData(JSON.stringify(drawing), true)}>Load</button>
+                    {canvasRef ? (<>
+                      <button onClick={handleSave}>SAVE</button>
+                      <button onClick={handleState}>LOAD</button>
+                      <button onClick={()=>canvasRef.clear()}>Clear</button>
+                      <button onClick={()=>canvasRef.undo()}>Undo</button>
+                      <button onClick={()=>{canvasRef.loadSaveData(JSON.stringify({
+    "lines": [
+        {
+            "points": [
+                {
+                    "x": 419.1032459743615,
+                    "y": 232.53962513619842
+                },
+                {
+                    "x": 419.1032459743615,
+                    "y": 232.53962513619842
+                },
+                {
+                    "x": 419.1032459743615,
+                    "y": 232.53962513619842
+                },
+                {
+                    "x": 419.1032459743615,
+                    "y": 232.53962513619842
+                },
+                {
+                    "x": 419.1032459743615,
+                    "y": 232.53962513619842
+                }
+            ],
+            "brushColor": "#000000",
+            "brushRadius": 10
+        }
+    ],
+    "width": 800,
+    "height": 600
+}),true)}}>test</button>
+<button onClick={()=>{console.log("localstate: " + drawing)}}>local state</button>
+                      {/* <button onClick={()=>canvasRef.loadSaveData(JSON.stringify(drawing), true)}>Load</button> */}
+
+                      </>) : (
+                      <div></div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -230,3 +263,5 @@ function App() {
 }
 
 export default App;
+
+

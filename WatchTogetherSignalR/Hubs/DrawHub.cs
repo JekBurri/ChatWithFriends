@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.OpenApi.Any;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 using WatchTogetherSignalR.Models;
 
 namespace WatchTogetherSignalR.Hubs
@@ -11,24 +10,38 @@ namespace WatchTogetherSignalR.Hubs
 
         public DrawHub(SharedDb shared) => _shared = shared;
 
-        public async Task SaveDrawing(int drawingId, Dictionary<string, object> drawingData)
+        public async Task SaveDrawing(string drawingId, Dictionary<string, object> drawingData)
         {
-            _shared.drawings.TryAdd(drawingId.ToString(), new DrawConnection { DrawingId = drawingId, DrawingData = drawingData });
+            // string key = drawingId.ToString();
 
-            // await Clients.All.SendAsync("ReceiveDrawing", drawingData);
+            Console.WriteLine($"\n**SharedDb drawings before update (JSON):**\n{JsonConvert.SerializeObject(_shared.drawings)}");
 
-            // Add a console log to confirm that SaveDrawing was called
+            // Attempt to update the existing entry if it exists, otherwise add a new one
+            if (!_shared.drawings.TryAdd(drawingId, new DrawConnection { DrawingId = drawingId, DrawingData = drawingData }))
+            {
+                // If TryAdd fails, it means the key already exists, so update the value
+                _shared.drawings[drawingId] = new DrawConnection { DrawingId = drawingId, DrawingData = drawingData };
+
+                Console.WriteLine($"\n**SharedDb drawings after update (JSON):**\n{JsonConvert.SerializeObject(_shared.drawings)}");
+                Console.WriteLine($"Drawing saved: {drawingId}");
+
+                // Send the updated drawing to all clients
+                await Clients.All.SendAsync("ReceiveDrawing", drawingData);
+            }
+
+            // Other parts of the method remain unchanged
             Console.WriteLine($"Drawing saved: {drawingId}");
         }
 
-        public async Task GetDrawing(int drawingId)
+
+        public async Task GetDrawing(string drawingId)
         {
-            if (_shared.drawings.TryGetValue(drawingId.ToString(), out DrawConnection drawConnection))
+            if (_shared.drawings.TryGetValue(drawingId, out DrawConnection drawConnection))
             {
-                Console.WriteLine(_shared.drawings.ToString());
+                Console.WriteLine($"\n**SharedDb drawing details (JSON):**\n{JsonConvert.SerializeObject(_shared.drawings)}");
+
                 await Clients.Caller.SendAsync("GetDrawing", drawConnection.DrawingData);
             }
         }
-
     }
 }

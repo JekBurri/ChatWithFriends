@@ -9,6 +9,7 @@
       "WatchTogetherSignalR/1.0.0": {
         "dependencies": {
           "Microsoft.AspNet.SignalR": "2.4.3",
+          "Newtonsoft.Json": "13.0.3",
           "Swashbuckle.AspNetCore": "6.4.0"
         },
         "runtime": {
@@ -25,7 +26,7 @@
       "Microsoft.AspNet.SignalR.Core/2.4.3": {
         "dependencies": {
           "Microsoft.Owin.Security": "2.1.0",
-          "Newtonsoft.Json": "6.0.4"
+          "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
           "lib/net45/Microsoft.AspNet.SignalR.Core.dll": {
@@ -95,11 +96,11 @@
           }
         }
       },
-      "Newtonsoft.Json/6.0.4": {
+      "Newtonsoft.Json/13.0.3": {
         "runtime": {
-          "lib/net45/Newtonsoft.Json.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.4.17603"
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.3.27908"
           }
         }
       },
@@ -227,12 +228,12 @@
       "path": "microsoft.owin.security/2.1.0",
       "hashPath": "microsoft.owin.security.2.1.0.nupkg.sha512"
     },
-    "Newtonsoft.Json/6.0.4": {
+    "Newtonsoft.Json/13.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-FyQLmEpjsCrEP+znauLDGAi+h6i9YnaMkITlfIoiM4RYyX3nki306bTHsr/0okiIvIc7BJhQTbOAIZVocccFUw==",
-      "path": "newtonsoft.json/6.0.4",
-      "hashPath": "newtonsoft.json.6.0.4.nupkg.sha512"
+      "sha512": "sha512-HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+      "path": "newtonsoft.json/13.0.3",
+      "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
     },
     "Owin/1.0.0": {
       "type": "package",

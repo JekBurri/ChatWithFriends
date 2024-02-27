@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export const WaitingRoom = ({joinChatRoom}:any) => {
     const [username, setUsername] = useState("");
-    const [chatroom, setChatroom] = useState("");
+    const [chatroom, setChatroom] = useState("room1");
 
     return (
         <form onSubmit={e => {
