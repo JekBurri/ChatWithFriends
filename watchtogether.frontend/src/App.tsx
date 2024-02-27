@@ -216,69 +216,7 @@ function App() {
                       onChange={(e) => setBrushColor(e.target.value)}
                     />
                     {/* Save button */}
-                    {canvasRef ? (
-                      <>
-                        <button onClick={handleSave}>SAVE</button>
-                        <button onClick={handleState}>LOAD</button>
-                        <button onClick={() => canvasRef.current?.clear()}>
-                          Clear
-                        </button>
-                        <button onClick={() => canvasRef.current?.undo()}>
-                          Undo
-                        </button>
-                        <button
-                          onClick={() => {
-                            canvasRef.current?.loadSaveData(
-                              JSON.stringify({
-                                lines: [
-                                  {
-                                    points: [
-                                      {
-                                        x: 419.1032459743615,
-                                        y: 232.53962513619842,
-                                      },
-                                      {
-                                        x: 419.1032459743615,
-                                        y: 232.53962513619842,
-                                      },
-                                      {
-                                        x: 419.1032459743615,
-                                        y: 232.53962513619842,
-                                      },
-                                      {
-                                        x: 419.1032459743615,
-                                        y: 232.53962513619842,
-                                      },
-                                      {
-                                        x: 419.1032459743615,
-                                        y: 232.53962513619842,
-                                      },
-                                    ],
-                                    brushColor: "#000000",
-                                    brushRadius: 10,
-                                  },
-                                ],
-                                width: 800,
-                                height: 600,
-                              }),
-                              true
-                            );
-                          }}
-                        >
-                          test
-                        </button>
-                        <button
-                          onClick={() => {
-                            console.log("localstate: " + drawing);
-                          }}
-                        >
-                          local state
-                        </button>
-                        {/* <button onClick={()=>canvasRef.loadSaveData(JSON.stringify(drawing), true)}>Load</button> */}
-                      </>
-                    ) : (
-                      <div></div>
-                    )}
+                    
                   </div>
                 </div>
               </div>
