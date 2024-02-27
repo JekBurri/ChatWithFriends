@@ -79,13 +79,13 @@ function App() {
         console.log("Drawing being saved:", drawingData);
   
         try {
-          const drawingId = uuidv4();
-          setDrawingRoomId(drawingId);
+          // const drawingId = uuidv4();
+          setDrawingRoomId(room);
   
           if (canvasConnection) {
             // await canvasConnection.invoke("GetDrawing", drawingRoomId);
             // @ts-ignore
-            await canvasConnection.invoke("SaveDrawing", drawingId, drawingData);
+            await canvasConnection.invoke("SaveDrawing", room, drawingData);
             console.log("Drawing saved:", drawingData);
           } else {
             console.error("Canvas connection is not in a connected state.");
