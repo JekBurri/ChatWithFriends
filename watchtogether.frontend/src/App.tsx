@@ -14,22 +14,29 @@ function App() {
   const [drawingRoomId, setDrawingRoomId] = useState<string>("");
   const [drawing, setDrawing] = useState<string>("");
   const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
-  
+  const handleMouseDown = () => {
+    setIsDrawing(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+    handleSave(); // Save the drawing state on mouse up
+  };
 
   useEffect(() => {
-   
     const loadCanvasData = async () => {
-      try {  
+      try {
         console.log("Parsed Drawing Room Id:", drawingRoomId);
-    
+
         if (canvasConnection) {
           await canvasConnection.invoke("GetDrawing", drawingRoomId);
-        } 
-    } catch (error) {
-      console.error("Error loading canvas data:", error);
-    }
-  }
+        }
+      } catch (error) {
+        console.error("Error loading canvas data:", error);
+      }
+    };
 
     if (canvasRef.current && canvasConnection) {
       console.log("Loading canvas data...");
@@ -42,18 +49,18 @@ function App() {
       canvasRef.current?.loadSaveData(drawing, true);
     }
   }, [drawing]);
-  
+
   const handleState = async () => {
     // ... other code
-  
+
     // 1. Check if canvasRef and connection exist
     if (!canvasRef.current || !canvasConnection) {
       console.error("Canvas reference or connection is null or undefined");
       return;
     }
-  
+
     console.log("Loading canvas data...");
-  
+
     try {
       await canvasConnection.invoke("GetDrawing", drawingRoomId);
       canvasRef?.current.loadSaveData(drawing, true);
@@ -62,25 +69,22 @@ function App() {
       console.error("Error loading drawing:", error);
     }
   };
-  
 
   const handleSave = async () => {
     // @ts-ignore
     if (canvasRef.current && canvasConnection) {
-      
       // @ts-ignore
       const saveData = canvasRef.current.getSaveData();
-      
-  
+
       if (saveData) {
         const drawingData = JSON.parse(saveData);
-  
+
         console.log("Drawing being saved:", drawingData);
-  
+
         try {
           // const drawingId = uuidv4();
           setDrawingRoomId(room);
-  
+
           if (canvasConnection) {
             // await canvasConnection.invoke("GetDrawing", drawingRoomId);
             // @ts-ignore
@@ -99,7 +103,7 @@ function App() {
       console.error("Canvas reference or connection is null or undefined");
     }
   };
-  
+
   const joinChatRoom = async (username: string, chatroom: string) => {
     setRoom(chatroom);
     try {
@@ -144,17 +148,16 @@ function App() {
       });
 
       canvasConn.on("GetDrawing", (drawingData: any) => {
-        console.log("Attempting to get drawing...")
+        console.log("Attempting to get drawing...");
         if (drawingData) {
           setDrawing(JSON.stringify(drawingData));
-          console.log(drawingData)
+          console.log(drawingData);
           console.log("Drawing received:", drawingData);
           canvasRef.current?.loadSaveData(JSON.stringify(drawingData), true);
         } else {
           console.error("Invalid drawingData:", drawingData);
         }
       });
-      
 
       await canvasConn.start();
       // @ts-ignore
@@ -192,13 +195,19 @@ function App() {
                 <ChatRoom messages={messages} sendMessage={sendMessage} />
                 <div className="flex p-4">
                   {/* CanvasDraw component */}
-                  <CanvasDraw
-                    ref={(canvas: any) => canvasRef.current = canvas}
-                    brushColor={brushColor}
-                    canvasWidth={800}
-                    canvasHeight={600}
-                    hideGrid
-                  />
+                  <div
+                    className="flex p-4"
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                  >
+                    <CanvasDraw
+                      ref={(canvas: any) => (canvasRef.current = canvas)}
+                      brushColor={brushColor}
+                      canvasWidth={800}
+                      canvasHeight={600}
+                      hideGrid
+                    />
+                  </div>
                   <div className="flex flex-col items-center ml-4">
                     {/* Color picker */}
                     <input
@@ -207,47 +216,67 @@ function App() {
                       onChange={(e) => setBrushColor(e.target.value)}
                     />
                     {/* Save button */}
-                    {canvasRef ? (<>
-                      <button onClick={handleSave}>SAVE</button>
-                      <button onClick={handleState}>LOAD</button>
-                      <button onClick={()=>canvasRef.current?.clear()}>Clear</button>
-                      <button onClick={()=>canvasRef.current?.undo()}>Undo</button>
-                      <button onClick={()=>{canvasRef.current?.loadSaveData(JSON.stringify({
-    "lines": [
-        {
-            "points": [
-                {
-                    "x": 419.1032459743615,
-                    "y": 232.53962513619842
-                },
-                {
-                    "x": 419.1032459743615,
-                    "y": 232.53962513619842
-                },
-                {
-                    "x": 419.1032459743615,
-                    "y": 232.53962513619842
-                },
-                {
-                    "x": 419.1032459743615,
-                    "y": 232.53962513619842
-                },
-                {
-                    "x": 419.1032459743615,
-                    "y": 232.53962513619842
-                }
-            ],
-            "brushColor": "#000000",
-            "brushRadius": 10
-        }
-    ],
-    "width": 800,
-    "height": 600
-}),true)}}>test</button>
-<button onClick={()=>{console.log("localstate: " + drawing)}}>local state</button>
-                      {/* <button onClick={()=>canvasRef.loadSaveData(JSON.stringify(drawing), true)}>Load</button> */}
-
-                      </>) : (
+                    {canvasRef ? (
+                      <>
+                        <button onClick={handleSave}>SAVE</button>
+                        <button onClick={handleState}>LOAD</button>
+                        <button onClick={() => canvasRef.current?.clear()}>
+                          Clear
+                        </button>
+                        <button onClick={() => canvasRef.current?.undo()}>
+                          Undo
+                        </button>
+                        <button
+                          onClick={() => {
+                            canvasRef.current?.loadSaveData(
+                              JSON.stringify({
+                                lines: [
+                                  {
+                                    points: [
+                                      {
+                                        x: 419.1032459743615,
+                                        y: 232.53962513619842,
+                                      },
+                                      {
+                                        x: 419.1032459743615,
+                                        y: 232.53962513619842,
+                                      },
+                                      {
+                                        x: 419.1032459743615,
+                                        y: 232.53962513619842,
+                                      },
+                                      {
+                                        x: 419.1032459743615,
+                                        y: 232.53962513619842,
+                                      },
+                                      {
+                                        x: 419.1032459743615,
+                                        y: 232.53962513619842,
+                                      },
+                                    ],
+                                    brushColor: "#000000",
+                                    brushRadius: 10,
+                                  },
+                                ],
+                                width: 800,
+                                height: 600,
+                              }),
+                              true
+                            );
+                          }}
+                        >
+                          test
+                        </button>
+                        <button
+                          onClick={() => {
+                            console.log("localstate: " + drawing);
+                          }}
+                        >
+                          local state
+                        </button>
+                        {/* <button onClick={()=>canvasRef.loadSaveData(JSON.stringify(drawing), true)}>Load</button> */}
+                      </>
+                    ) : (
                       <div></div>
                     )}
                   </div>
@@ -262,5 +291,3 @@ function App() {
 }
 
 export default App;
-
-
