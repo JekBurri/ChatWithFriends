@@ -14,14 +14,13 @@ function App() {
   const [drawingRoomId, setDrawingRoomId] = useState<string>("");
   const [drawing, setDrawing] = useState<string>("");
   const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
 
   const handleMouseDown = () => {
-    setIsDrawing(true);
+    
   };
 
   const handleMouseUp = () => {
-    setIsDrawing(false);
+    
     handleSave(); // Save the drawing state on mouse up
   };
 
@@ -31,6 +30,7 @@ function App() {
         console.log("Parsed Drawing Room Id:", drawingRoomId);
 
         if (canvasConnection) {
+          // @ts-ignore
           await canvasConnection.invoke("GetDrawing", drawingRoomId);
         }
       } catch (error) {
@@ -46,29 +46,10 @@ function App() {
 
   useEffect(() => {
     if (drawing) {
+      // @ts-ignore
       canvasRef.current?.loadSaveData(drawing, true);
     }
   }, [drawing]);
-
-  const handleState = async () => {
-    // ... other code
-
-    // 1. Check if canvasRef and connection exist
-    if (!canvasRef.current || !canvasConnection) {
-      console.error("Canvas reference or connection is null or undefined");
-      return;
-    }
-
-    console.log("Loading canvas data...");
-
-    try {
-      await canvasConnection.invoke("GetDrawing", drawingRoomId);
-      canvasRef?.current.loadSaveData(drawing, true);
-      console.log("Clicked LOAD -> Current state to load:", drawing);
-    } catch (error) {
-      console.error("Error loading drawing:", error);
-    }
-  };
 
   const handleSave = async () => {
     // @ts-ignore
@@ -109,7 +90,7 @@ function App() {
     try {
       // @ts-ignore
       const conn = new HubConnectionBuilder()
-        .withUrl("http://localhost:5289/Chat")
+        .withUrl("https://watchtogethersignalr.fly.dev/Chat")
         .configureLogging(LogLevel.Information)
         .build();
 
@@ -135,7 +116,7 @@ function App() {
     try {
       // @ts-ignore
       const canvasConn = new HubConnectionBuilder()
-        .withUrl("http://localhost:5289/Draw")
+        .withUrl("https://watchtogethersignalr.fly.dev/Draw")
         .configureLogging(LogLevel.Information)
         .build();
 
@@ -144,6 +125,7 @@ function App() {
         console.log("Loading drawing...");
         //TODO:
         // Use optional chaining to check if canvasRef is not null or undefined
+        // @ts-ignore
         canvasRef.current?.loadSaveData(JSON.stringify(drawingData), true);
       });
 
@@ -153,6 +135,7 @@ function App() {
           setDrawing(JSON.stringify(drawingData));
           console.log(drawingData);
           console.log("Drawing received:", drawingData);
+          // @ts-ignore
           canvasRef.current?.loadSaveData(JSON.stringify(drawingData), true);
         } else {
           console.error("Invalid drawingData:", drawingData);

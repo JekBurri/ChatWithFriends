@@ -21,6 +21,7 @@ export default function ChatRoom({messages, sendMessage}: any) {
   </div>
 
   {/* Message Container */}
+  { /* @ts-ignore */ }
   <div className="flex-1 overflow-y-auto px-5 py-3" ref={messagesContainerRef}>
     <MessageContainer messages={messages} />
   </div>
