@@ -77,3 +77,4 @@ C:\Users\JekBurri\Desktop\ChatWithFriends\WatchTogetherSignalR\obj\Debug\net8.0\
 C:\Users\JekBurri\Desktop\ChatWithFriends\WatchTogetherSignalR\obj\Debug\net8.0\WatchTogetherSignalR.pdb
 C:\Users\JekBurri\Desktop\ChatWithFriends\WatchTogetherSignalR\obj\Debug\net8.0\WatchTogetherSignalR.genruntimeconfig.cache
 C:\Users\JekBurri\Desktop\ChatWithFriends\WatchTogetherSignalR\obj\Debug\net8.0\ref\WatchTogetherSignalR.dll
+C:\Users\JekBurri\Desktop\ChatWithFriends\WatchTogetherSignalR\bin\Debug\net8.0\WatchTogetherSignalR.staticwebassets.runtime.json
